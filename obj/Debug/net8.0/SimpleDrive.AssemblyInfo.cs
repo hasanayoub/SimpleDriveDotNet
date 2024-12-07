@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SimpleDrive")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e78a03730a541d5c175c2d2821248c92ab41f3e1")]
 [assembly: System.Reflection.AssemblyProductAttribute("SimpleDrive")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SimpleDrive")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

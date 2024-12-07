@@ -177,10 +177,11 @@ public class BlobControllerIntegrationTests
     [Fact]
     public async Task UploadBlob_GetBlobsListData() // todo: fix this test
     {
+        var storageType = _configuration!["StorageType"] ?? "Local";
         // read file content from disk.
         var token = await GetToken();
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        var response = await _httpClient.GetAsync("/api/v1/blobs");
+        var response = await _httpClient.GetAsync("/api/v1/blobs?storageType=" + storageType);
         _testOutputHelper.WriteLine("Response: " + response.StatusCode);
 
         // Assert
@@ -282,6 +283,6 @@ public class BlobControllerIntegrationTests
         // Assert
         Assert.False(response.IsSuccessStatusCode);
         var responseBody = await response.Content.ReadAsStringAsync();
-        Assert.Contains("Failed to store blob", responseBody);
+        Assert.Contains("Invalid input", responseBody);
     }
 }

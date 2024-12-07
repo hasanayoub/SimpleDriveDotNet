@@ -229,3 +229,4 @@
 /Users/hassanayoub/OfflineProjects/SimpleDrive/SimpleDrive/bin/Debug/net8.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
 /Users/hassanayoub/OfflineProjects/SimpleDrive/SimpleDrive/bin/Debug/net8.0/BCrypt.Net-Next.dll
 /Users/hassanayoub/OfflineProjects/SimpleDrive/SimpleDrive/bin/Debug/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/Users/hassanayoub/OfflineProjects/SimpleDrive/SimpleDrive/obj/Debug/net8.0/SimpleDrive.sourcelink.json

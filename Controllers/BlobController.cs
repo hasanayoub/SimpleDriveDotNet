@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,10 +17,33 @@ public class BlobController(AppDbContext context, StorageServiceFactory storageS
 {
     private readonly BlobStorageType _storageType = Enum.Parse<BlobStorageType>(options.Value.StorageType);
 
-    [HttpGet]
-    public async Task<BlobResponse[]> GetBlobs()
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetBlob([FromRoute] string id)
     {
-        var blobs = await context.BlobMetadata.ToListAsync();
+        var metadata = await context.BlobMetadata.FirstOrDefaultAsync(b => b.BlobId == id);
+        if (metadata == null) return NotFound(new { message = "Blob not found" });
+
+        var storageService = storageServiceFactory.GetStorageService(metadata.StorageType);
+        var data = await storageService.GetBlobAsync(id, metadata.ContentType);
+        var base64 = Convert.ToBase64String(data ?? []);
+
+        return Ok(new BlobResponse()
+        {
+            Data = base64,
+            CreatedAt = metadata.CreatedAt,
+            Id = metadata.BlobId,
+            Size = metadata.Size
+        });
+    }
+
+    // add optional query parameter storageType
+    [HttpGet]
+    public async Task<BlobResponse[]> GetBlobs([FromQuery] BlobStorageType? storageType)
+    {
+        var blobs = storageType != null
+            ? await context.BlobMetadata.Where(m => m.StorageType == storageType).ToListAsync()
+            : await context.BlobMetadata.ToListAsync();
 
         var blobResponses = blobs.Select(blob => new BlobResponse()
         {
@@ -35,6 +59,17 @@ public class BlobController(AppDbContext context, StorageServiceFactory storageS
     [HttpPost]
     public async Task<IActionResult> UploadBlob([FromBody] BlobRequest request)
     {
+        // Validate the request
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToList();
+
+            return BadRequest(new { message = "Invalid input", errors });
+        }
+        
         var (contentType, base64DataString) = ExtractContentTypeAndData(request.Data);
         var metadata = new BlobMetadata
         {
@@ -81,25 +116,6 @@ public class BlobController(AppDbContext context, StorageServiceFactory storageS
         }
     }
 
-    [HttpGet("/v1/blobs/{id}")]
-    public async Task<IActionResult> GetBlob(string id)
-    {
-        var metadata = await context.BlobMetadata.FirstOrDefaultAsync(b => b.BlobId == id);
-        if (metadata == null) return NotFound(new { message = "Blob not found" });
-
-        var storageService = storageServiceFactory.GetStorageService(metadata.StorageType);
-        var data = await storageService.GetBlobAsync(id, metadata.ContentType);
-        var base64 = Convert.ToBase64String(data ?? []);
-
-        return Ok(new BlobResponse()
-        {
-            Data = base64,
-            CreatedAt = metadata.CreatedAt,
-            Id = metadata.BlobId,
-            Size = metadata.Size
-        });
-    }
-
     private static (string ContentType, string Base64Data) ExtractContentTypeAndData(string base64Input)
     {
         // Check if the Base64 string includes content type
@@ -113,8 +129,16 @@ public class BlobController(AppDbContext context, StorageServiceFactory storageS
 
 public class BlobRequest
 {
-    [JsonPropertyName("id")] public string Id { get; set; } = string.Empty;
-    [JsonPropertyName("data")] public string Data { get; set; } = string.Empty;
+    [JsonPropertyName("id")]
+    [Required(ErrorMessage = "Invalid input. Id is required.")]
+    [StringLength(50, ErrorMessage = "Invalid input. Id must be less than 50 characters.")]
+    public string Id { get; set; } = string.Empty;
+
+    [JsonPropertyName("data")]
+    [Required(ErrorMessage = "Invalid input. Data is required.")]
+    [RegularExpression(@"^data:image\/(png|jpeg|jpg|gif);base64,[A-Za-z0-9+/=]+$",
+        ErrorMessage = "Invalid input. Data must be a valid base64 image.")]
+    public string Data { get; set; } = string.Empty;
 }
 
 public class BlobResponse

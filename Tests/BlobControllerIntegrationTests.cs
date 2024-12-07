@@ -15,13 +15,7 @@ public class BlobControllerIntegrationTests
 {
     private readonly ITestOutputHelper _testOutputHelper;
     private readonly HttpClient _httpClient;
-    private const string Iso8601DateTimeFormat = "yyyyMMddTHHmmssZ";
-    private const string BucketName = "files";
     private static IConfigurationRoot? _configuration;
-    private static string? _bucketUrl;
-    private static string? _region;
-    private static string? _accessKey;
-    private static string? _secretKey;
     private static string? _filePath;
     private static string? _fileHashValue;
     private static string? _serverUrl;
@@ -38,39 +32,10 @@ public class BlobControllerIntegrationTests
 
     private static void BuildConfiguration()
     {
-        _configuration = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json").Build();
-        _bucketUrl = _configuration["S3:BucketUrl"];
-        _region = _configuration["S3:Region"];
-        _accessKey = _configuration["S3:AccessKey"];
-        _secretKey = _configuration["S3:SecretKey"];
+        _configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
         _filePath = _configuration["Testing:FilePath"];
         _serverUrl = _configuration["Testing:ServerUrl"];
         _fileHashValue = _configuration["Testing:FileHashValue"];
-    }
-
-    [Fact]
-    public async Task UploadBlob_TestCreate_Canonical_Request()
-    {
-        var data = await File.ReadAllBytesAsync(_filePath!);
-        var bucketUrl = _bucketUrl!;
-
-        var id = Guid.NewGuid().ToString();
-        var uri = new Uri($"{bucketUrl}/{id}");
-        var request = new HttpRequestMessage(HttpMethod.Put, uri)
-        {
-            Content = new ByteArrayContent(data)
-        };
-
-        request.Headers.Host = request.RequestUri?.Host;
-        var utcNow = DateTimeOffset.UtcNow;
-        var amzLongDate = utcNow.ToString(Iso8601DateTimeFormat, CultureInfo.InvariantCulture);
-
-        var payloadHash = data.Length > 0 ? AwsV4Agent.Hash(data) : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
-        request.Headers.Add("x-amz-date", amzLongDate);
-        request.Headers.Add("x-amz-content-sha256", payloadHash);
-        var signedHeaders = string.Join(";", request.Headers.OrderBy(h => h.Key.ToLowerInvariant()).Select(h => h.Key.ToLowerInvariant()));
-        var canonicalRequest = AwsV4Agent.BuildCanonicalRequest(request, signedHeaders, payloadHash);
-        _testOutputHelper.WriteLine(canonicalRequest);
     }
 
     [Fact]
@@ -79,65 +44,6 @@ public class BlobControllerIntegrationTests
         var fileContent = await File.ReadAllBytesAsync(_filePath!);
         var awsHash = AwsV4Agent.Hash(fileContent);
         Assert.Equal(_fileHashValue, awsHash);
-    }
-
-    [Fact]
-    public async Task UploadBlob_UploadFile()
-    {
-        var httpClient = new HttpClient();
-        var data = await File.ReadAllBytesAsync(_filePath!);
-        var id = Guid.NewGuid().ToString();
-        const string contentType = "image/jpeg";
-        var uri = new Uri($"{_bucketUrl}/files/{id}");
-        var aws = new AwsV4Agent("s3", _region, _accessKey, _secretKey);
-        var request = await aws.PrepareRequestMessageAsync(uri.ToString(), HttpMethod.Put, data);
-        if (!string.IsNullOrEmpty(contentType))
-        {
-            if (request.Content != null) request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
-            request.Headers.TryAddWithoutValidation("Content-Type", new MediaTypeHeaderValue(contentType).ToString());
-        }
-
-        var response = await httpClient.SendAsync(request);
-        _testOutputHelper.WriteLine(response.StatusCode.ToString());
-        _testOutputHelper.WriteLine(response.Content.ToString());
-        _testOutputHelper.WriteLine(await response.Content.ReadAsStringAsync());
-        Assert.True(response.IsSuccessStatusCode);
-    }
-
-    [Fact]
-    public async Task UploadBlob_CreateBucket()
-    {
-        var httpClient = new HttpClient();
-        var aws = new AwsV4Agent("s3", _region, _accessKey, _secretKey);
-        var uri = new Uri(_bucketUrl!);
-        var request = await aws.PrepareRequestMessageAsync(uri.ToString());
-        var response = await httpClient.SendAsync(request);
-        _testOutputHelper.WriteLine(response.StatusCode.ToString());
-        _testOutputHelper.WriteLine(response.Content.ToString());
-        if (response.IsSuccessStatusCode)
-        {
-            _testOutputHelper.WriteLine("Bucket created successfully");
-            var content = await response.Content.ReadAsStringAsync();
-            _testOutputHelper.WriteLine(content);
-            var doc = XDocument.Parse(content);
-            var bucketNames = doc.Descendants("Name").Select(x => x.Value).ToList();
-
-            if (bucketNames.Contains(BucketName))
-            {
-                _testOutputHelper.WriteLine("Bucket already exists");
-            }
-            else
-            {
-                uri = new Uri($"{_bucketUrl}/{BucketName}");
-                request = await aws.PrepareRequestMessageAsync(uri.ToString(), HttpMethod.Put);
-                response = await httpClient.SendAsync(request);
-                _testOutputHelper.WriteLine(response.StatusCode.ToString());
-                _testOutputHelper.WriteLine(response.Content.ToString());
-                _testOutputHelper.WriteLine(await response.Content.ReadAsStringAsync());
-            }
-        }
-
-        // read response content
     }
 
     [Fact]

@@ -6,6 +6,14 @@
     }
   },
   "AllowedHosts": "*",
+  "Connection": {
+    "Server": "localhost",
+    "Database": "simple_drive",
+    "User": "root",
+    "Password": "rootroot",
+    "RDBMS": "MySQL",
+    "RDBMSVersion": "8.4.3"
+  },
   "StorageType": "S3",
   "UserAuth": {
     "Username": "hasanayoub",
@@ -13,14 +21,25 @@
   },
   "JwtToken": {
     "TokenIssuer": "HassanAyoub",
+    "JwtSecretKey": "S9@q(cJE2AgfM%PwI(pZSXjNBwH#W&mp",
     "TokenAudience": "PublicUsers"
+  },
+  "Minio": {
+    "BucketUrl": "https://minio-drivey.eu.ngrok.io",
+    "AccessKey": "75F6AM42UAL3MV8NWH49",
+    "SecretKey": "HpEYTKiC+bqEpU7+sDdxpYzBNN+Me5x+YY8PJVzZ",
+    "Region": "us-east-1"
   },
   "S3": {
     "BucketUrl": "https://paylinkspaces.ams3.digitaloceanspaces.com",
+    "AccessKey": "DO00WGRPUQTAXA9RZB9F",
+    "SecretKey": "uPDVBvDSjVen4bIRnhWdcB5r89MdS/Y6pKsoyu7BWdk",
     "Region": "us-east-1"
   },
   "FTP": {
     "FtpUrl": "ftp://ftp.drivehq.com",
+    "FtpUsername": "hassan.ayoub.1980",
+    "FtpPassword": "Password@123"
   },
   "FileSystem": {
     "StoragePath": "/Users/hassanayoub/SimpleDrive/Storage"
@@ -28,6 +47,8 @@
   "Database": {
     "Server": "localhost",
     "DatabaseName": "simple_drive",
+    "User": "root",
+    "Password": "rootroot",
     "Rdbms": "MySQL",
     "RdbmsVersion": "8.4.3"
   },

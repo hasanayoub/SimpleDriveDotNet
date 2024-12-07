@@ -1,4 +1,3 @@
-/Users/hassanayoub/OfflineProjects/SimpleDrive/SimpleDrive/bin/Debug/net8.0/appsettings.Development.json
 /Users/hassanayoub/OfflineProjects/SimpleDrive/SimpleDrive/bin/Debug/net8.0/appsettings.json
 /Users/hassanayoub/OfflineProjects/SimpleDrive/SimpleDrive/bin/Debug/net8.0/xunit.runner.visualstudio.testadapter.dll
 /Users/hassanayoub/OfflineProjects/SimpleDrive/SimpleDrive/bin/Debug/net8.0/xunit.runner.reporters.netcoreapp10.dll
@@ -230,3 +229,5 @@
 /Users/hassanayoub/OfflineProjects/SimpleDrive/SimpleDrive/obj/Debug/net8.0/SimpleDrive.pdb
 /Users/hassanayoub/OfflineProjects/SimpleDrive/SimpleDrive/obj/Debug/net8.0/SimpleDrive.genruntimeconfig.cache
 /Users/hassanayoub/OfflineProjects/SimpleDrive/SimpleDrive/obj/Debug/net8.0/ref/SimpleDrive.dll
+/Users/hassanayoub/OfflineProjects/SimpleDrive/SimpleDrive/bin/Debug/net8.0/DotNetEnv.dll
+/Users/hassanayoub/OfflineProjects/SimpleDrive/SimpleDrive/bin/Debug/net8.0/Sprache.dll

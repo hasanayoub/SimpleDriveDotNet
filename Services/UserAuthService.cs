@@ -4,8 +4,8 @@ using BCrypt.Net;
 
 public class UserAuthService
 {
-    public string Username { get; init; } = null!;
-    public string HashedPassword { get; init; } = null!;
+    public string Username { get; set; } = null!;
+    public string HashedPassword { get; set; } = null!;
 
     public bool VerifyPassword(string username, string password)
     {

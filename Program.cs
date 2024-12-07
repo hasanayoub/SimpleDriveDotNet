@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -9,7 +10,12 @@ using SimpleDrive.Models;
 using SimpleDrive.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
+// Load environment variables from .env file
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Use environment variables in appsettings.json
+Env.Load();
 
 #region Culture
 
@@ -34,10 +40,20 @@ builder.Services.Configure<UserAuthService>(builder.Configuration.GetSection("Us
 builder.Services.Configure<StorageSettings>(builder.Configuration);
 
 var ftpSettings = builder.Configuration.GetSection("Ftp").Get<FtpSettings>()!;
+
 var connection = builder.Configuration.GetSection("Database").Get<DatabaseSettings>()!;
+
 var jwtSettings = builder.Configuration.GetSection("JwtToken").Get<JwtTokenSettings>()!;
 
 #endregion
+
+builder.Configuration.AddEnvironmentVariables();
+
+ftpSettings.FtpUsername = builder.Configuration.GetValue<string>("FTP:USERNAME");
+ftpSettings.FtpPassword = builder.Configuration.GetValue<string>("FTP:PASSWORD");
+connection.Password = builder.Configuration.GetValue<string>("DATABASE:PASSWORD");
+connection.User = builder.Configuration.GetValue<string>("DATABASE:USER");
+jwtSettings.JwtSecretKey = builder.Configuration.GetValue<string>("JWT_TOKEN:SECRET_KEY");
 
 #region Services
 
@@ -88,6 +104,8 @@ builder.Services.AddScoped<S3StorageService>(sp =>
 {
     var httpClient = sp.GetRequiredService<HttpClient>();
     var settings = sp.GetRequiredService<IOptions<S3Settings>>().Value;
+    settings.AccessKey = builder.Configuration.GetValue<string>("S3:ACCESS_KEY");
+    settings.SecretKey = builder.Configuration.GetValue<string>("S3:SECRET_KEY");
     return new S3StorageService(httpClient, settings.BucketUrl, settings.AccessKey, settings.SecretKey, settings.Region);
 });
 
@@ -102,10 +120,14 @@ builder.Services.AddScoped<LocalFileStorageService>(sp =>
 builder.Services.AddHttpClient<FtpStorageService>();
 builder.Services.AddScoped<FtpStorageService>(_ => new FtpStorageService(ftpSettings.FtpUrl, ftpSettings.FtpUsername, ftpSettings.FtpPassword));
 
+var username = builder.Configuration.GetValue<string>("USER_AUTH:USERNAME")!;
+var hashedPassword = builder.Configuration.GetValue<string>("USER_AUTH:HASHED_PASSWORD")!;
 // Add UserAuthService
 builder.Services.AddScoped<UserAuthService>(sp =>
 {
     var setting = sp.GetRequiredService<IOptions<UserAuthService>>().Value;
+    setting.HashedPassword = hashedPassword;
+    setting.Username = username;
     return new UserAuthService { Username = setting.Username, HashedPassword = setting.HashedPassword };
 });
 
@@ -113,7 +135,7 @@ builder.Services.AddScoped<UserAuthService>(sp =>
 builder.Services.AddScoped<StorageServiceFactory>();
 
 // Add Token Agent Services 
-builder.Services.AddScoped<TokenAgent>(_ => new TokenAgent(jwtSettings.JwtSecretKey, jwtSettings.TokenIssuer, jwtSettings.TokenAudience));
+builder.Services.AddScoped<TokenAgent>(_ => new TokenAgent(jwtSettings.JwtSecretKey!, jwtSettings.TokenIssuer, jwtSettings.TokenAudience));
 
 #endregion
 

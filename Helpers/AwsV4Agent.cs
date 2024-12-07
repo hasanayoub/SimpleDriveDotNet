@@ -30,13 +30,14 @@ public class AwsV4Agent(string? service, string? region, string? accessKey, stri
 
         var canonicalRequest = BuildCanonicalRequest(request, signedHeaders, payloadHash);
         var stringToSign = BuildStringToSign(canonicalRequest, amzLongDate, amzShortDate);
-
         var signature = CalculateSignature(amzShortDate, stringToSign);
+        var authorizationValue = $"AWS4-HMAC-SHA256 Credential={accessKey}/{amzShortDate}/{region}/{service}/aws4_request, SignedHeaders={signedHeaders}, Signature={signature}";
+        request.Headers.TryAddWithoutValidation("Authorization", authorizationValue);
 
-        request.Headers.TryAddWithoutValidation(
-            "Authorization",
-            $"AWS4-HMAC-SHA256 Credential={accessKey}/{amzShortDate}/{region}/{service}/aws4_request, SignedHeaders={signedHeaders}, Signature={signature}"
-        );
+        Console.WriteLine("CanonicalRequest: " + canonicalRequest);
+        Console.WriteLine("String to Sign: " + stringToSign);
+        Console.WriteLine("Signature is:" + signature);
+        Console.WriteLine("Authorization Value: " + authorizationValue);
 
         return Task.FromResult(request);
     }

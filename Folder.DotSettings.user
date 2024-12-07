@@ -19,12 +19,7 @@
   &lt;Assembly Path="/usr/local/share/dotnet/shared/Microsoft.NETCore.App/8.0.11/System.ComponentModel.Annotations.dll" /&gt;
   &lt;Assembly Path="/Users/hassanayoub/.nuget/packages/pomelo.entityframeworkcore.mysql/8.0.0/lib/net8.0/Pomelo.EntityFrameworkCore.MySql.dll" /&gt;
 &lt;/AssemblyExplorer&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a5c76c0c_002Daf70_002D4fb5_002Da580_002Ddbac62f724e0/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="UploadBlob_ShouldReturnOk #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;TestAncestor&gt;
-    &lt;TestId&gt;xUnit::AF13A976-23DB-592B-B5CC-567552E9ABE2::net8.0::SimpleDrive.Tests.BlobControllerIntegrationTests.UploadBlob_ShouldReturnOk&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::AF13A976-23DB-592B-B5CC-567552E9ABE2::net8.0::SimpleDrive.Tests.BlobControllerIntegrationTests.UploadBlob_GetBlobsListData&lt;/TestId&gt;
-  &lt;/TestAncestor&gt;
-&lt;/SessionState&gt;</s:String>
+	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=d1d8ca39_002D69eb_002D4979_002D9d5f_002D782a7cd5732d/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="UploadBlob_ShouldReturnOk" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
     &lt;TestId&gt;xUnit::AF13A976-23DB-592B-B5CC-567552E9ABE2::net8.0::SimpleDrive.Tests.BlobControllerIntegrationTests&lt;/TestId&gt;

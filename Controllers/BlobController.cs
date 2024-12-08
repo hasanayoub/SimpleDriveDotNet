@@ -18,7 +18,23 @@ public class BlobController(AppDbContext context, StorageServiceFactory storageS
     private readonly BlobStorageType _storageType = Enum.Parse<BlobStorageType>(options.Value.StorageType);
 
 
+    /// <summary>
+    ///  Get a blob by id
+    /// </summary>
+    /// <description>
+    /// This endpoint returns a blob by id from the database, S3, Local file system, or the storage service based on the storage type. 
+    /// </description>
+    /// <param name="id">
+    /// The id of the blob to retrieve
+    /// </param>
+    /// <returns>
+    /// A blob response object
+    /// </returns>
+    /// <response code="200">Returns the blob</response>
+    /// <response code="404">If the blob is not found</response>
     [HttpGet("{id}")]
+    [ProducesResponseType(typeof(BlobResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetBlob([FromRoute] string id)
     {
         var metadata = await context.BlobMetadata.FirstOrDefaultAsync(b => b.BlobId == id);
@@ -37,8 +53,14 @@ public class BlobController(AppDbContext context, StorageServiceFactory storageS
         });
     }
 
-    // add optional query parameter storageType
+    /// <summary>
+    /// Get all blobs or blobs by storage type from the database. 
+    /// </summary>
+    /// <param name="storageType">The storage type of the blobs to retrieve. Valid values are "Local", "S3", "Ftp", "Database".</param>
+    /// <returns>An array of blob response objects.</returns>
     [HttpGet]
+    [ProducesResponseType(typeof(BlobResponse[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<BlobResponse[]> GetBlobs([FromQuery] BlobStorageType? storageType)
     {
         var blobs = storageType != null
@@ -56,7 +78,20 @@ public class BlobController(AppDbContext context, StorageServiceFactory storageS
         return blobResponses.ToArray();
     }
 
+    /// <summary>
+    /// Upload a blob to the database and the storage service based on the storage type. This storage type is set in the appsettings.json file.      
+    /// </summary>
+    /// <param name="request">
+    /// The blob request object
+    /// </param>
+    /// <returns>
+    /// A blob response object 
+    /// </returns>
+    /// <response code="200">Returns the blob</response>
+    /// <response code="400">If the request is invalid or the blob id already exists</response>
     [HttpPost]
+    [ProducesResponseType(typeof(BlobResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UploadBlob([FromBody] BlobRequest request)
     {
         // Validate the request
@@ -69,7 +104,7 @@ public class BlobController(AppDbContext context, StorageServiceFactory storageS
 
             return BadRequest(new { message = "Invalid input", errors });
         }
-        
+
         var (contentType, base64DataString) = ExtractContentTypeAndData(request.Data);
         var metadata = new BlobMetadata
         {
@@ -127,13 +162,22 @@ public class BlobController(AppDbContext context, StorageServiceFactory storageS
     }
 }
 
+/// <summary>
+/// A blob request object. 
+/// </summary>
 public class BlobRequest
 {
+    /// <summary>
+    /// The id of the blob.
+    /// </summary>
     [JsonPropertyName("id")]
     [Required(ErrorMessage = "Invalid input. Id is required.")]
     [StringLength(50, ErrorMessage = "Invalid input. Id must be less than 50 characters.")]
     public string Id { get; set; } = string.Empty;
 
+    /// <summary>
+    /// The base64 encoded data of the blob. 
+    /// </summary>
     [JsonPropertyName("data")]
     [Required(ErrorMessage = "Invalid input. Data is required.")]
     [RegularExpression(@"^data:image\/(png|jpeg|jpg|gif);base64,[A-Za-z0-9+/=]+$",
@@ -141,10 +185,32 @@ public class BlobRequest
     public string Data { get; set; } = string.Empty;
 }
 
+/// <summary>
+/// A blob response object.  
+/// </summary>
 public class BlobResponse
 {
-    [JsonPropertyName("id")] public string Id { get; init; } = string.Empty;
-    [JsonPropertyName("data")] public string Data { get; init; } = string.Empty;
-    [JsonPropertyName("size")] public long Size { get; init; }
-    [JsonPropertyName("created_at")] public DateTime CreatedAt { get; init; }
+    /// <summary>
+    /// The id of the blob 
+    /// </summary>
+    [JsonPropertyName("id")]
+    public string Id { get; init; } = string.Empty;
+
+    /// <summary>
+    /// The base64 encoded data of the blob
+    /// </summary>
+    [JsonPropertyName("data")]
+    public string Data { get; init; } = string.Empty;
+
+    /// <summary>
+    /// The size of the blob in bytes 
+    /// </summary>
+    [JsonPropertyName("size")]
+    public long Size { get; init; }
+
+    /// <summary>
+    /// The creation date of the blob 
+    /// </summary>
+    [JsonPropertyName("created_at")]
+    public DateTime CreatedAt { get; init; }
 }

@@ -175,7 +175,7 @@ public class BlobControllerIntegrationTests
     }
 
     [Fact]
-    public async Task UploadBlob_GetBlobsListData() // todo: fix this test
+    public async Task UploadBlob_GetBlobsListData() 
     {
         var storageType = _configuration!["StorageType"] ?? "Local";
         // read file content from disk.
@@ -244,7 +244,7 @@ public class BlobControllerIntegrationTests
     }
 
     [Fact]
-    public async Task UploadBlob_GetBlobsList() // todo: fix this test
+    public async Task UploadBlob_GetBlobsList()
     {
         var token = await GetToken();
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -261,7 +261,7 @@ public class BlobControllerIntegrationTests
     }
 
     [Fact]
-    public async Task UploadBlob_WithInvalidData_ShouldReturnBadRequest() // todo: fix this test
+    public async Task UploadBlob_WithInvalidData_ShouldReturnBadRequest()
     {
         // Arrange
         var invalidBlobRequest = new

@@ -25,6 +25,11 @@
     &lt;TestId&gt;xUnit::AF13A976-23DB-592B-B5CC-567552E9ABE2::net8.0::SimpleDrive.Tests.BlobControllerIntegrationTests&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=e8e99441_002D35e0_002D4931_002Dad9c_002Df6f1481b0923/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="UploadBlob_ShouldReturnOk #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;xUnit::AF13A976-23DB-592B-B5CC-567552E9ABE2::net8.0::SimpleDrive.Tests.BlobControllerIntegrationTests&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String>
 	
 	
 	

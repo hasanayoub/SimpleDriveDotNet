@@ -13,6 +13,7 @@
         "packagesPath": "/Users/hassanayoub/.nuget/packages/",
         "outputPath": "/Users/hassanayoub/OfflineProjects/SimpleDrive/SimpleDrive/obj/",
         "projectStyle": "PackageReference",
+        "UsingMicrosoftNETSdk": false,
         "configFilePaths": [
           "/Users/hassanayoub/.nuget/NuGet/NuGet.Config"
         ],
